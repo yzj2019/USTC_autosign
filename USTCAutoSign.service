@@ -1,0 +1,12 @@
+[Unit]
+Description=USTC Auto Sign
+After=network.target
+Wants=network.target
+
+[Service]
+Restart=on-failure
+RestartSec=5
+ExecStart=/usr/bin/python3 -u /root/USTC_autosign/AutoSign.py > /root/USTC_autosign/log.txt 2>&1
+
+[Install]
+WantedBy=multi-user.target
