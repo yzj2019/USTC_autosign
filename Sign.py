@@ -76,7 +76,7 @@ def USTC_dailysign(session, user):
         params['now_status'] = '2'
     res = session.post(url=sign_url, data=params, headers=headers)
     if (res.status_code == 200):
-        print('Daily Sign OK')
+        print('Daily Sign for {0} OK!'.format(user['username']))
     else:
         print('Daily Sign Failed')
 

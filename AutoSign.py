@@ -2,6 +2,7 @@
 # !python3
 # coding=UTF-8
 import sys  # 系统调用
+import os   # 用于获取脚本的绝对路径
 # 从单一文件ConnectToUSTC.py中引入依赖的方式：其中ConnectToUSTC.py用到的依赖不需要再次引入
 from ConnectToUSTC import getYmlConfig, conn_USTC  # 连接USTC统一身份认证
 from Sign import USTC_dailysign # 进行一次每日上报
@@ -10,7 +11,9 @@ import time  # 系统时间
 
 '''自动打卡的执行程序'''
 def AutoSign():
-    config = getYmlConfig('/root/USTC_autosign/config.yml')
+    abs_file = os.path.abspath(sys.argv[0])
+    abs_dir = abs_file[:abs_file.rfind("/")]    # 父文件夹绝对路径
+    config = getYmlConfig(abs_dir + '/config.yml')
     users = config['users']
     for user in users:
         session = conn_USTC(user)
@@ -19,7 +22,7 @@ def AutoSign():
 if __name__ == "__main__":
     while 1:
         time_now = time.strftime("%H", time.localtime())
-        if (time_now == "10"):
+        if (time_now == "09"):
             print('Auto Sign Start:')
             AutoSign()
             print('Auto Sign succeeded at {0}!'.format(time.strftime("%Y-%M-%D %H:%M:%S", time.localtime())))
