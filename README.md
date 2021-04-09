@@ -13,3 +13,6 @@ https://blog.csdn.net/superjunenaruto/article/details/105890739
 #### 自动打卡功能开发（已经绕过统一身份认证）
 
 同见https://www.jianshu.com/p/8cd6e9bc2680
+
+部署的时候，几个路径需要更改一下
+输入service USTCAutoSign status 查看服务进行状态；待测试如何将log信息重定向到文件

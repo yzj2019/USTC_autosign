@@ -10,7 +10,7 @@ import time  # 系统时间
 
 '''自动打卡的执行程序'''
 def AutoSign():
-    config = getYmlConfig('config.yml')
+    config = getYmlConfig('/root/USTC_autosign/config.yml')
     users = config['users']
     for user in users:
         session = conn_USTC(user)
@@ -19,11 +19,12 @@ def AutoSign():
 if __name__ == "__main__":
     while 1:
         time_now = time.strftime("%H", time.localtime())
-        if (time_now == "09"):
+        if (time_now == "10"):
             print('Auto Sign Start:')
             AutoSign()
             print('Auto Sign succeeded at {0}!'.format(time.strftime("%Y-%M-%D %H:%M:%S", time.localtime())))
             print('\n')
+            time.sleep(3600)
             # 待测试是否成功
             # 考虑整一个QQ机器人，每次成功打卡就给我发消息
         else:
