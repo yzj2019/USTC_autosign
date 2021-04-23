@@ -1,8 +1,0 @@
-#用户组配置
-users:
-  #单个用户配置
-  - user:
-      #username 学号
-      username: 'PB18000379'
-      #password 密码
-      password: 'yzj20000611'
