@@ -88,7 +88,8 @@ if __name__ == "__main__":
     for user in users:
         session = conn_USTC(user)
         USTC_dailysign(session, user)
-    print(session)
+    cookie_jar = session.cookies                                # 获取上次登录连接用的cookie
+    cookies = requests.utils.dict_from_cookiejar(cookie_jar)    # 转成dict形式
     chrome_options = Options()
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
@@ -97,6 +98,14 @@ if __name__ == "__main__":
     chrome_options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(options=chrome_options)       #创建浏览器对象
     driver.get('https://weixine.ustc.edu.cn/2020/home')     #打开网页
+    print(cookies)
+    for key, val in cookies.items():
+        # 将cookies以name:value的形式，逐个添加到selenium中
+        cookie = {}
+        cookie['name'] = key
+        cookie['value'] = val
+        driver.add_cookie(cookie)
+    driver.get('https://weixine.ustc.edu.cn/2020/home')     #打开网页
     print(driver)
+    driver.find_element_by_xpath("//button[@id='report-submit-btn']").click()
     driver.quit()
-    driver.find_element_by_id('report-submit-btn').click()
