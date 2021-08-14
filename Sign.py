@@ -6,8 +6,10 @@ import requests  # HTTP/HTTPS方便接口
 # from urllib.parse import urlparse  # URL解析
 # import json  # 用于处理json类型的返回数据
 # 从单一文件ConnectToUSTC.py中引入依赖地方式
-# from ConnectToUSTC import getYmlConfig, conn_USTC   # 连接USTC统一身份认证
+from ConnectToUSTC import getYmlConfig, conn_USTC   # 连接USTC统一身份认证
 from MyHTMLParser import Parser_lastdata    # 自定义HTML解析器
+from selenium import webdriver              # 浏览器驱动程序
+from selenium.webdriver.chrome.options import Options   # 选项
 
 # https://weixine.ustc.edu.cn/2020/home
 
@@ -20,7 +22,7 @@ def USTC_dailysign(session, user):
         'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,ja-JP;q=0.6,ja;q=0.5',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36',
         'referer': 'https://weixine.ustc.edu.cn/2020/login',
-        'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
+        'sec-ch-ua': '"Chromium";v="92", " Not A;Brand";v="99", "Google Chrome";v="92"',
         'sec-ch-ua-mobile': '?0',
         'sec-fetch-dest': 'document',
         'sec-fetch-mode': 'navigate',
@@ -37,13 +39,13 @@ def USTC_dailysign(session, user):
     parser.feed(res.text)
     parser.close()
     last_sign = parser.data
-    # print(parser.data)
+    print(parser.data)
     # 二次连接：打卡
     sign_url = 'https://weixine.ustc.edu.cn/2020/daliy_report'
     headers['referer'] = 'https://weixine.ustc.edu.cn/2020/home'
     headers['origin'] = 'https://weixine.ustc.edu.cn'
     headers['cache-control'] = 'max-age=0'
-    headers['content-length'] = '335'
+    headers['content-length'] = '365'
     headers['content-type'] = 'application/x-www-form-urlencoded'
     params = {
         '_token': last_sign['_token'],
@@ -80,9 +82,21 @@ def USTC_dailysign(session, user):
     else:
         print('Daily Sign Failed')
 
-'''if __name__ == "__main__":
+if __name__ == "__main__":
     config = getYmlConfig('config.yml')
     users = config['users']
     for user in users:
         session = conn_USTC(user)
-        USTC_dailysign(session, user)'''
+        USTC_dailysign(session, user)
+    print(session)
+    chrome_options = Options()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('blink-settings=imagesEnabled=false')
+    chrome_options.add_argument('--disable-gpu')
+    driver = webdriver.Chrome(options=chrome_options)       #创建浏览器对象
+    driver.get('https://weixine.ustc.edu.cn/2020/home')     #打开网页
+    print(driver)
+    driver.quit()
+    driver.find_element_by_id('report-submit-btn').click()

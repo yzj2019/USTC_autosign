@@ -117,13 +117,13 @@ def Query_grades(session):
     print(res.json())
 
 
-'''
+
 if __name__ == "__main__":
     config = getYmlConfig('config.yml')
     users = config['users']
     for user in users:
         session = conn_USTC(user)
         Query_grades(session)
-        '''
+        
 
 # https://jw.ustc.edu.cn/for-std/exam-arrange/info/24312

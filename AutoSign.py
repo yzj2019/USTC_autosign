@@ -1,6 +1,6 @@
-'''每小时判断一次，判断是否为上午09点'''
 # !python3
 # coding=UTF-8
+'''每小时判断一次，判断是否为上午09点'''
 import sys  # 系统调用
 import os   # 用于获取脚本的绝对路径
 # 从单一文件ConnectToUSTC.py中引入依赖的方式：其中ConnectToUSTC.py用到的依赖不需要再次引入
@@ -20,12 +20,13 @@ def AutoSign():
         USTC_dailysign(session, user)
 
 if __name__ == "__main__":
+    AutoSign()
     while 1:
         time_now = time.strftime("%H", time.localtime())
         if (time_now == "09"):
             print('Auto Sign Start:')
             AutoSign()
-            print('Auto Sign succeeded at {0}!'.format(time.strftime("%Y-%M-%D %H:%M:%S", time.localtime())))
+            print('Auto Sign succeeded at {0}!'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
             print('\n')
             time.sleep(3600)
             # 待测试是否成功

@@ -1,6 +1,6 @@
 # !python3
 # coding=UTF-8
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 
 # 把HTMLParser向上封装一层，详见https://www.cnblogs.com/zhanghaohong/p/4562127.html
 class Parser_loginurl(HTMLParser):

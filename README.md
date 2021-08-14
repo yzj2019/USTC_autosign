@@ -3,7 +3,12 @@
 ### 开机自启动服务
 
 https://blog.csdn.net/superjunenaruto/article/details/105890739
-https://my.oschina.net/u/3585265/blog/4702483、https://www.huankui.com/7098.html
+
+https://my.oschina.net/u/3585265/blog/4702483
+
+https://www.cnblogs.com/shuiche/p/9327809.html
+
+https://www.cnblogs.com/f-society/p/13177614.html
 
 ### 通过统一身份认证连接综合教务系统，并保持连接
 
