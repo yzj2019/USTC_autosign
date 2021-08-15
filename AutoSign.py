@@ -5,7 +5,7 @@ import sys  # 系统调用
 import os   # 用于获取脚本的绝对路径
 # 从单一文件ConnectToUSTC.py中引入依赖的方式：其中ConnectToUSTC.py用到的依赖不需要再次引入
 from ConnectToUSTC import getYmlConfig, conn_USTC  # 连接USTC统一身份认证
-from Sign import USTC_dailysign # 进行一次每日上报
+from Sign import USTC_dailysign, USTC_dailysign_selenium # 进行一次每日上报
 import time  # 系统时间
 
 
@@ -18,6 +18,7 @@ def AutoSign():
     for user in users:
         session = conn_USTC(user)
         USTC_dailysign(session, user)
+        USTC_dailysign_selenium(session)
 
 if __name__ == "__main__":
     AutoSign()

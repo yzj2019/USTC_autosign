@@ -10,6 +10,7 @@ from ConnectToUSTC import getYmlConfig, conn_USTC   # 连接USTC统一身份认�
 from MyHTMLParser import Parser_lastdata    # 自定义HTML解析器
 from selenium import webdriver              # 浏览器驱动程序
 from selenium.webdriver.chrome.options import Options   # 选项
+import time                                 # 休眠用
 
 # https://weixine.ustc.edu.cn/2020/home
 
@@ -39,7 +40,6 @@ def USTC_dailysign(session, user):
     parser.feed(res.text)
     parser.close()
     last_sign = parser.data
-    print(parser.data)
     # 二次连接：打卡
     sign_url = 'https://weixine.ustc.edu.cn/2020/daliy_report'
     headers['referer'] = 'https://weixine.ustc.edu.cn/2020/home'
@@ -82,6 +82,35 @@ def USTC_dailysign(session, user):
     else:
         print('Daily Sign Failed')
 
+
+def USTC_dailysign_selenium(session):
+    '''进行一次每日上报，selenium + webdriver实现'''
+    cookie_jar = session.cookies                                # 获取上次登录连接用的cookie
+    cookies = requests.utils.dict_from_cookiejar(cookie_jar)    # 转成dict形式
+    # 预设选项
+    chrome_options = Options()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('blink-settings=imagesEnabled=false')
+    chrome_options.add_argument('--disable-gpu')
+    driver = webdriver.Chrome(options=chrome_options)       # 创建浏览器对象
+    driver.get('https://weixine.ustc.edu.cn/2020/home')     # 打开网页，为了预先加载
+    for key, val in cookies.items():
+        # 将cookies以name:value的形式，逐个添加到selenium创建的新会话中
+        cookie = {}
+        cookie['name'] = key
+        cookie['value'] = val
+        driver.add_cookie(cookie)
+    driver.get('https://weixine.ustc.edu.cn/2020/home')     # 打开网页
+    time.sleep(5)                                           # 为了等待网页加载完成
+    driver.find_element_by_xpath("//button[@id='report-submit-btn']").click()
+    time.sleep(5)                                           # 等待网页交互
+    driver.get_screenshot_as_file('screenshot.png')         # 截图
+    driver.quit()
+
+
+
 if __name__ == "__main__":
     config = getYmlConfig('config.yml')
     users = config['users']
@@ -106,6 +135,9 @@ if __name__ == "__main__":
         cookie['value'] = val
         driver.add_cookie(cookie)
     driver.get('https://weixine.ustc.edu.cn/2020/home')     #打开网页
+    time.sleep(5)
     print(driver)
     driver.find_element_by_xpath("//button[@id='report-submit-btn']").click()
+    time.sleep(5)
+    driver.get_screenshot_as_file('screenshot.png')         # 截图
     driver.quit()
