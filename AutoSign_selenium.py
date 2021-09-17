@@ -6,6 +6,7 @@ import os       # 用于获取脚本的绝对路径
 import yaml     # python处理yaml文件
 from selenium import webdriver                          # 浏览器驱动程序
 from selenium.webdriver.chrome.options import Options   # 选项
+import time   
 
 
 def getYmlConfig(yaml_file):
@@ -32,6 +33,14 @@ class USTC_autosign(object):
     def get_driver(self):
         '''获取浏览器对象'''
         chrome_options = Options()
+        desired_capabilities = webdriver.DesiredCapabilities.INTERNETEXPLORER.copy()
+        desired_capabilities['proxy'] = {
+            "httpProxy": 'http://wvpn.ustc.edu.cn',
+            "noProxy": None,
+            "proxyType": "MANUAL",
+            "class": "org.openqa.selenium.Proxy",
+            "autodetect": False
+        }
         chrome_options.add_argument('lang=zh_CN.UTF-8')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
@@ -39,18 +48,27 @@ class USTC_autosign(object):
         chrome_options.add_argument('blink-settings=imagesEnabled=false')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('user-agent="Mozilla/5.0 (iPod; U; CPU iPhone OS 2_1 like Mac OS X; ja-jp) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5F137 Safari/525.20"')
+        # driver = webdriver.Chrome(options=chrome_options, desired_capabilities=desired_capabilities)       #创建浏览器对象
         driver = webdriver.Chrome(options=chrome_options)       #创建浏览器对象
         return driver
 
 
     def conn_USTC(self, user):
         '''通过单用户的统一身份认证，并返回浏览器对象'''
-        login_url = 'https://jw.ustc.edu.cn/login'
+        wvpn_url = 'https://wvpn.ustc.edu.cn/'
+        login_url = 'https://jw.ustc.edu.cn/'
         print('connecting to %s ...' % login_url)
         driver = self.get_driver()
+        # driver.get(wvpn_url)
+        # time.sleep(10)
+        # driver.get_screenshot_as_file('screenshot_wvpn.png')         # 截图
         driver.get(login_url)
+        time.sleep(3)
+        driver.get_screenshot_as_file('screenshot_ucaslogin.png')         # 截图
         driver.find_element_by_id('login-unified-wrapper').click()
-        driver.
+        time.sleep(3)
+        driver.get_screenshot_as_file('screenshot_ucaslogin.png')         # 截图
+        # driver.
         driver.find_element_by_id('login').click()
 
         return driver
