@@ -6,7 +6,8 @@ import sys  # 系统调用
 from urllib.parse import urlparse  # URL解析
 import yaml  # python处理yaml文件
 import json  # 用于处理json类型的返回数据
-from MyHTMLParser import Parser_loginurl  # HTMLParser自定义解析器
+from MyHTMLParser import Parser_loginurl, Parser_validateimg  # HTMLParser自定义解析器
+from cnocr import CnOcr # ocr识别
 
 debug = False
 
@@ -30,12 +31,28 @@ def conn_USTC(user):
     user = user['user']
     # 首次访问，获取统一身份认证地址
     login_url = 'https://jw.ustc.edu.cn/login'
+    headers = {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,ja-JP;q=0.6,ja;q=0.5',
+        'cache-control': 'max-age=0',
+        'sec-ch-ua': '"Google Chrome";v="93", " Not;A Brand";v="99", "Chromium";v="93"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'sec-fetch-dest': 'document',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-site': 'none',
+        'sec-fetch-user': '?1',
+        'upgrade-insecure-requests': '1',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36'
+    }
     print('connecting to %s ...' % login_url)
-    res = requests.get(url=login_url)
+    res = requests.get(url=login_url, headers=headers)
     parser = Parser_loginurl()
     parser.feed(res.text)
     parser.close()
-    print(parser.links[0])
+    print(res.text)
+    print("获取的统一身份认证地址:{0}".format(parser.links[0]))
     # 解析并生成下一个url
     urlparser = urlparse(login_url)
     host = urlparser.netloc
@@ -52,7 +69,29 @@ def conn_USTC(user):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'
     }
     res = session.get(url=ucaslogin_url, headers=headers)
-    print(res.cookies)
+    # print(res.cookies)
+
+    # 获取验证码图片，识别验证码
+    validate_code = '1234'
+
+    ## 解析前面获取的html，得到验证码图片链接
+    parser = Parser_validateimg()
+    parser.feed(res.text)
+    parser.close()
+    print("验证码图片地址:{0}".format(parser.links[0]))
+    img_url = parser.links[0]
+    path = './validatecode.jpg'
+
+    ## 获取并保存验证码图片
+    res = requests.get(img_url)
+    with open (path, 'wb') as fp:
+        fp.write(res.content)
+    fp.close()
+
+    ## 识别验证码
+    ocr = CnOcr()
+    ocr_res = ocr.ocr(path)
+    print(res)
 
     # 建立统一身份认证连接，并保持连接
     # 登陆时提交表格用到这里的参数，是通过chrome开发者工具查看请求的模式并模仿
@@ -62,9 +101,10 @@ def conn_USTC(user):
         'model': 'uplogin.jsp',
         'service': '',
         'warn': '',
-        'showCode': '',
+        'showCode': '1',
         'username': user['username'],
         'password': user['password'],
+        'LT': validate_code,
         'button': ''
     }
     print('connecting to {0},{1},{2} ...'.format(res.url, user['username'], user['password']))

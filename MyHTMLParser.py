@@ -80,3 +80,47 @@ class Parser_lastdata(HTMLParser):
                     name = attrs[1][1]
                     value = attrs[2][1]
                     self.data[name] = value
+
+
+
+class Parser_validateimg(HTMLParser):
+    '''分离出统一身份认证验证码的地址'''
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.data = []  # 定义data数组用来存储html中的数据
+        self.links = [] # 验证码获取链接
+
+    def handle_starttag(self, tag, attrs):
+        # print('<%s>' % tag)
+        if tag == 'a':
+            if len(attrs) == 0:
+                pass
+            else:
+                tag = False
+                for (Name, Value) in attrs:
+                    if Name == 'class':
+                        # 获取统一身份认证接口
+                        if Value == 'validate-img':
+                            tag = True
+                    if Name == 'src':
+                        if tag == True:
+                            self.links.append(Value)
+    """
+    def handle_endtag(self, tag):
+        print('<%s>' % tag)
+
+    def handle_startendtag(self, tag, attrs):
+        print('<%s>' % tag)
+
+    def handle_data(self, data):
+        print('data===>', data)
+
+    def handle_comment(self, data):
+        print('<!--', data, '-->')
+
+    def handle_entityref(self, name):
+        print("&%s;" % name)
+
+    def handle_charref(self, name):
+        print('&#%s;' % name)
+    """
